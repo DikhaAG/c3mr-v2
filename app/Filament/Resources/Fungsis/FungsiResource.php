@@ -13,12 +13,15 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class FungsiResource extends Resource
 {
+    protected static ?string $navigationLabel = 'Fungsi';
     protected static ?string $model = Fungsi::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = 'Data';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::UserCircle;
 
     public static function form(Schema $schema): Schema
     {

@@ -16,9 +16,13 @@ use Filament\Tables\Table;
 
 class TimResource extends Resource
 {
+    protected static ?string $navigationLabel = 'Tim';
     protected static ?string $model = Tim::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Users;
 
     public static function form(Schema $schema): Schema
     {

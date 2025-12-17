@@ -13,12 +13,15 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class PaketResource extends Resource
 {
+    protected static ?string $navigationLabel = 'Paket Layanan';
     protected static ?string $model = Paket::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = 'Data';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ClipboardDocument;
 
     public static function form(Schema $schema): Schema
     {

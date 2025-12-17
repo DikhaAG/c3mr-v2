@@ -16,9 +16,13 @@ use Filament\Tables\Table;
 
 class PelangganResource extends Resource
 {
+    protected static ?string $navigationLabel = 'Pelanggan';
     protected static ?string $model = Pelanggan::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::UserGroup;
 
     public static function form(Schema $schema): Schema
     {

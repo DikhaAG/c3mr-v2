@@ -13,12 +13,15 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class KeteranganResource extends Resource
 {
+    protected static ?string $navigationLabel = 'Keterangan';
     protected static ?string $model = Keterangan::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = 'Data';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::PencilSquare;
 
     public static function form(Schema $schema): Schema
     {
