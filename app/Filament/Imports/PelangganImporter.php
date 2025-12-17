@@ -16,69 +16,121 @@ class PelangganImporter extends Importer
     {
         return [
             ImportColumn::make('tanggal')
-                ->rules(['date']),
+                ->label('TANGGAL')
+                ->rules(['required', 'date']),
+
             ImportColumn::make('id_pelanggan')
-                ->rules(['max:255']),
+                ->label('SND')
+                ->requiredMapping()
+                ->rules(['required', 'max:255']),
+
             ImportColumn::make('domisili')
+                ->label('WOK')
                 ->rules(['max:255']),
+
             ImportColumn::make('category_billing')
+                ->label('CATEGORY BILLING')
                 ->rules(['max:255']),
+
             ImportColumn::make('nama_pelanggan')
+                ->label('NAMA PELANGGAN')
                 ->rules(['max:255']),
+
             ImportColumn::make('cp')
+                ->label('CP')
                 ->rules(['max:255']),
+
             ImportColumn::make('branch')
+                ->label('BRANCH')
                 ->rules(['max:255']),
+
             ImportColumn::make('sto')
+                ->label('STO')
                 ->rules(['max:255']),
+
             ImportColumn::make('los')
+                ->label('LOS')
                 ->rules(['max:255']),
+
             ImportColumn::make('status')
+                ->label('STATUS')
                 ->rules(['max:255']),
+
             ImportColumn::make('habit_category')
+                ->label('HABIT CATEGORY')
                 ->rules(['max:255']),
+
             ImportColumn::make('total_tagihan')
+                ->label('TOTAL TAGIHAN')
                 ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->rules(['required', 'numeric']),
+
             ImportColumn::make('fungsi')
+                ->label('FUNGSI')
                 ->rules(['max:255']),
+
             ImportColumn::make('admin')
+                ->label('ADMIN')
                 ->rules(['max:255']),
+
             ImportColumn::make('r_caring_status')
+                ->label('R_CARING_STATUS')
                 ->rules(['max:255']),
+
             ImportColumn::make('keterangan')
+                ->label('KETERANGAN')
                 ->rules(['max:255']),
+
             ImportColumn::make('paket')
+                ->label('PAKET')
                 ->rules(['max:255']),
+
             ImportColumn::make('tgl_aktivasi')
-                ->rules(['date']),
+                ->label('TGL_AKTIVASI')
+                ->rules(['nullable', 'date']),
+
             ImportColumn::make('status_bayar')
+                ->label('STATUS BAYAR')
                 ->rules(['max:255']),
+
             ImportColumn::make('payment_date')
-                ->rules(['date']),
+                ->label('PAYMENT_DATE1')
+                ->rules(['nullable', 'date']),
+
             ImportColumn::make('payment_amount')
+                ->label('PAYMENT_AMOUNT1')
                 ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->rules(['required', 'numeric']),
+
             ImportColumn::make('channel_bayar')
+                ->label('CHANEL BAYAR 1')
                 ->rules(['max:255']),
+
             ImportColumn::make('regional')
+                ->label('REGIONAL')
                 ->rules(['max:100']),
         ];
     }
 
     public function resolveRecord(): Pelanggan
     {
-        return new Pelanggan();
+        /**
+         * Di Filament 4, Anda bisa melakukan logic "Upsert" di sini.
+         * Contoh: mencari pelanggan berdasarkan id_pelanggan agar tidak duplikat.
+         */
+        return Pelanggan::firstOrNew([
+            'id_pelanggan' => $this->data['id_pelanggan'],
+        ]);
     }
 
     public static function getCompletedNotificationBody(Import $import): string
     {
-        $body = 'Your pelanggan import has completed and ' . Number::format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
+        $body = 'Impor pelanggan telah selesai dan ' . Number::format($import->successful_rows) . ' ' . str('baris')->plural($import->successful_rows) . ' berhasil diimpor.';
 
         if ($failedRowsCount = $import->getFailedRowsCount()) {
-            $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to import.';
+            $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('baris')->plural($failedRowsCount) . ' gagal diimpor.';
         }
 
         return $body;
