@@ -56,7 +56,8 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-             ->darkMode(false);
+             ->darkMode(false)
+            ->brandName('C3MR');
         ;
     }
 }
