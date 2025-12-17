@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Resources\Pelanggans\Widgets\StatsOverview;
+use App\Filament\Resources\Tims\Widgets\TimPerformanceTable;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Forms\Components\DatePicker;
 use Filament\Schemas\Components\Section; // Namespace baru untuk Layout di v4
@@ -37,6 +38,7 @@ class Dashboard extends BaseDashboard
     {
         return [
             StatsOverview::class,
+            TimPerformanceTable::class,
         ];
     }
 }
