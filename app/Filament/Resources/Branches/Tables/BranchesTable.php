@@ -20,7 +20,8 @@ class BranchesTable
                 ImportAction::make()
                     ->importer(BranchImporter::class)
                     ->label('Import Branch')
-                    ->modalHeading('Unggah File Branch (CSV/XLSX)'),
+                    ->modalHeading('Unggah File (CSV/XLSX)')
+->modalDescription('Pastikan file berisi kolom/header bernama "branch"'),
             ])
             ->columns([
                 TextColumn::make('nama')
