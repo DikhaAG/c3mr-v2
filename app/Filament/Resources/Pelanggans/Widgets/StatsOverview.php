@@ -44,4 +44,5 @@ class StatsOverview extends StatsOverviewWidget
             )->icon('heroicon-m-shield-check'),
         ];
     }
+
 }
