@@ -21,7 +21,7 @@ class FungsisTable
                     ->importer(FungsiImporter::class)
                     ->label('Import Fungsi')
                     ->modalHeading('Unggah File (CSV/XLSX)')
-                ->modalDescription('Pastikan file berisi kolom/header bernama "fungsi"'),
+                    ->modalDescription('Pastikan file berisi kolom/header bernama "fungsi"'),
             ])
             ->columns([
                 TextColumn::make('nama')

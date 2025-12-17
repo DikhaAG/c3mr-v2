@@ -19,7 +19,6 @@ class BranchResource extends Resource
 {
     protected static ?string $navigationLabel = 'Branch';
     protected static ?string $model = Branch::class;
-
     protected static string|UnitEnum|null $navigationGroup = 'Data';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::BuildingLibrary;
 
