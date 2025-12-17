@@ -16,4 +16,10 @@ class Tim extends Model
         'regional',
         'branch',
     ];
+    public function pelanggans()
+    {
+        // admin: nama kolom di tabel pelanggan
+        // nama_lengkap: nama kolom di tabel tim
+        return $this->hasMany(\App\Models\Pelanggan::class, 'admin', 'nama_lengkap');
+    }
 }

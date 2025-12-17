@@ -14,6 +14,8 @@ use Filament\Tables\Table;
 use Filament\Tables as Tables;
 use Filament\Forms as Forms;
 use Filament\Actions as Actions;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 
 class PelanggansTable
 {
@@ -81,6 +83,12 @@ class PelanggansTable
 
                 Actions\EditAction::make(),
                 Actions\DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
             ]);
+
     }
 }

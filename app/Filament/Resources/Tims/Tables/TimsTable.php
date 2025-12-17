@@ -13,11 +13,19 @@ class TimsTable
     public static function configure(Table $table): Table
     {
         return $table
+            // Mengoptimalkan query dengan withCount
+            ->modifyQueryUsing(fn($query) => $query->withCount('pelanggans'))
             ->columns([
                 TextColumn::make('username')
                     ->searchable(),
                 TextColumn::make('nama_lengkap')
                     ->searchable(),
+                // Menampilkan Jumlah Pelanggan
+                TextColumn::make('pelanggans_count')
+                    ->label('Total Pelanggan')
+                    ->badge()
+                    ->color('success')
+                    ->sortable(),
                 TextColumn::make('regional')
                     ->searchable(),
                 TextColumn::make('branch')
