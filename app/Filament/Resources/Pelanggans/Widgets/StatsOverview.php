@@ -4,7 +4,7 @@ namespace App\Filament\Resources\Pelanggans\Widgets;
 
 use App\Models\Pelanggan;
 use App\Models\Tim;
-use App\Models\RCaringStatus;
+/* use App\Models\RCaringStatus; */
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
@@ -33,15 +33,15 @@ class StatsOverview extends StatsOverviewWidget
                 ->icon('heroicon-m-banknotes'),
 
             Stat::make(
-                'Match Admin/Tim',
+                'Total Call Tim',
                 // Clone query agar filter tanggal tetap terbawa namun tidak merusak query utama
                 (clone $query)->whereIn('admin', Tim::pluck('nama_lengkap'))->count()
-            )->icon('heroicon-m-check-badge'),
-
-            Stat::make(
-                'Match Caring Status',
-                (clone $query)->whereIn('r_caring_status', RCaringStatus::pluck('nama'))->count()
-            )->icon('heroicon-m-shield-check'),
+            )->icon('heroicon-m-phone-arrow-up-right'),
+            /**/
+            /* Stat::make( */
+            /*     'Match Caring Status', */
+            /*     (clone $query)->whereIn('r_caring_status', RCaringStatus::pluck('nama'))->count() */
+            /* )->icon('heroicon-m-shield-check'), */
         ];
     }
 
