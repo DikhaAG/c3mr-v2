@@ -95,11 +95,11 @@ class PelangganImporter extends Importer
                 ->rules(['max:255']),
 
             ImportColumn::make('payment_date')
-                ->label('PAYMENT_DATE1')
+                ->label('PAYMENT_DATE 1')
                 ->rules(['nullable', 'date']),
 
             ImportColumn::make('payment_amount')
-                ->label('PAYMENT_AMOUNT1')
+                ->label('PAYMENT_AMOUNT 1')
                 ->requiredMapping()
                 ->numeric()
                 ->rules(['required', 'numeric']),
