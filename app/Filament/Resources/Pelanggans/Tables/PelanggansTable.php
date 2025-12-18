@@ -78,6 +78,25 @@ class PelanggansTable
                                 fn(Builder $query, $date): Builder => $query->whereDate('tanggal', '<=', $date),
                             );
                     }),
+                // TAMBAHKAN FILTER RADIO BUTTON DI SINI
+                Tables\Filters\SelectFilter::make('r_caring_status')
+                    ->label('Status Caring')
+                    ->options([
+                        'CONTACTED' => 'Contacted',
+                        'NOT CONTACTED' => 'Not Contacted',
+                        'null' => 'Tidak ada', // Kita gunakan string 'null' sebagai kunci sementara
+                    ])
+                    ->native(false)
+                    ->query(function (Builder $query, array $data) {
+                        if ($data['value'] === 'null') {
+                            return $query->whereNull('r_caring_status');
+                        }
+
+                        return $query->when(
+                            $data['value'],
+                            fn(Builder $query, $value) => $query->where('r_caring_status', $value)
+                        );
+                    }),
             ])
             ->recordActions([ // Sesuai standar v4 menggantikan actions()
                 // ACTION CALL
