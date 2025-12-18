@@ -27,10 +27,9 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Red,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
@@ -57,7 +56,20 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
              ->darkMode(false)
-            ->brandName('C3MR');
+            ->brandName('C3MR')
+            ->colors(
+                [
+                    'danger' => Color::Red,
+                    'gray' => Color::Zinc,
+                    'info' => Color::Blue,
+                    'primary' => Color::Red,
+                    'success' => Color::Green,
+                    'warning' => Color::Amber,
+                ],
+            )
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->sidebarCollapsibleOnDesktop()
+
         ;
     }
 }

@@ -1,4 +1,70 @@
-@import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import "../../../../vendor/filament/filament/resources/css/theme.css";
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+
+.fi-topbar {
+    @apply bg-red-700;
+}
+
+.fi-topbar .fi-breadcrumbs-item-label,
+.fi-topbar .fi-topbar-item-label {
+    @apply text-white;
+}
+
+.fi-logo {
+    color: white;
+}
+
+.fi-icon-btn {
+    color: white;
+}
+
+.fi-sidebar {
+    @apply bg-red-700;
+}
+
+.fi-sidebar-item-btn {
+    & > .fi-icon {
+        color: white;
+    }
+}
+.fi-sidebar-item-label {
+    color: white;
+}
+
+.fi-sidebar-item {
+    &.fi-sidebar-item-has-url {
+        & > .fi-sidebar-item-btn:hover {
+            color: red;
+        }
+    }
+}
+
+.fi-sidebar-item {
+    &.fi-active {
+        & > .fi-sidebar-item-btn {
+            & > .fi-icon {
+                color: var(--primary-600);
+            }
+        }
+    }
+}
+.fi-sidebar-item {
+    &.fi-active {
+        & > .fi-sidebar-item-btn {
+            & > .fi-sidebar-item-label {
+                color: var(--primary-600);
+            }
+        }
+    }
+}
+
+.fi-sidebar-group-label {
+    color: white;
+}
+.fi-sidebar-group-btn {
+    & .fi-icon {
+        color: white;
+    }
+}
