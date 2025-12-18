@@ -14,6 +14,12 @@ class StatsOverview extends StatsOverviewWidget
 {
     use InteractsWithPageFilters;
 
+    protected int|string|array $columnSpan = 'full';
+    // Atau atur grid-nya
+    protected function getColumns(): int
+    {
+        return 3; // Menampilkan 3 card per baris (akan jadi 2 baris)
+    }
     protected function getStats(): array
     {
         // Mengambil filter dari Page (Filament 4 menggunakan struktur array yang sama)
@@ -37,6 +43,26 @@ class StatsOverview extends StatsOverviewWidget
                 // Clone query agar filter tanggal tetap terbawa namun tidak merusak query utama
                 (clone $query)->whereIn('admin', Tim::pluck('nama_lengkap'))->count()
             )->icon('heroicon-m-phone-arrow-up-right'),
+            // Card Baru: Contacted
+            Stat::make('Contacted', (clone $query)->where('r_caring_status', 'CONTACTED')->count())
+                ->description('Pelanggan berhasil dihubungi')
+                ->descriptionIcon('heroicon-m-check-circle')
+                ->color('success')
+                ->icon('heroicon-m-phone'),
+
+            // Card Baru: Not Contacted
+            Stat::make('Not Contacted', (clone $query)->where('r_caring_status', 'NOT CONTACTED')->count())
+                ->description('Pelanggan gagal dihubungi')
+                ->descriptionIcon('heroicon-m-x-circle')
+                ->color('danger')
+                ->icon('heroicon-m-phone-x-mark'),
+
+            // Card Baru: Belum di-Call (NULL)
+            Stat::make('Belum di-Call', (clone $query)->whereNull('r_caring_status')->count())
+                ->description('Menunggu tindakan')
+                ->descriptionIcon('heroicon-m-clock')
+                ->color('gray')
+                ->icon('heroicon-m-minus-circle'),
             /**/
             /* Stat::make( */
             /*     'Match Caring Status', */
