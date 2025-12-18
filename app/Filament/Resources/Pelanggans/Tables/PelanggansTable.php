@@ -10,20 +10,26 @@ use App\Models\Paket;
 use App\Models\StatusBayar;
 use App\Filament\Imports\PelangganImporter;
 use Filament\Tables\Table;
-// Import Alias untuk Filament 4
 use Filament\Tables as Tables;
 use Filament\Forms as Forms;
 use Filament\Actions as Actions;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Builder;
 
 class PelanggansTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->filtersTriggerAction(
+                fn(Action $action) => $action
+                    ->icon('heroicon-m-funnel')
+                    ->color('danger'),
+            )
             ->headerActions([
-                // Di v4, ImportAction di-import dari Filament\Actions
                 Actions\ImportAction::make()->importer(PelangganImporter::class),
             ])
             ->columns([
@@ -54,6 +60,24 @@ class PelanggansTable
                 Tables\Columns\TextColumn::make('status_bayar'),
                 Tables\Columns\TextColumn::make('payment_date')->date(),
                 Tables\Columns\TextColumn::make('payment_amount')->numeric(locale: 'id'),
+            ])
+            ->filters([
+                Filter::make('tanggal')
+                    ->schema([
+                        Forms\Components\DatePicker::make('dari_tanggal')->label('Dari Tanggal'),
+                        Forms\Components\DatePicker::make('sampai_tanggal')->label('Sampai Tanggal'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['dari_tanggal'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('tanggal', '>=', $date),
+                            )
+                            ->when(
+                                $data['sampai_tanggal'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('tanggal', '<=', $date),
+                            );
+                    }),
             ])
             ->recordActions([ // Sesuai standar v4 menggantikan actions()
                 // ACTION CALL
