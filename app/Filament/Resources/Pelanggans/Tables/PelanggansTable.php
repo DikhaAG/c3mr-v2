@@ -36,9 +36,18 @@ class PelanggansTable
                 Tables\Columns\TextColumn::make('branch')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('los'),
                 Tables\Columns\TextColumn::make('habit_category'),
-                Tables\Columns\TextColumn::make('total_tagihan')->numeric(locale: 'id'),
+                Tables\Columns\TextColumn::make('total_tagihan')
+                    ->money('IDR', locale: 'id')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('admin')->searchable(),
-                Tables\Columns\TextColumn::make('r_caring_status'),
+                Tables\Columns\TextColumn::make('r_caring_status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'CONTACTED' => 'success',      // Hijau (Teks Putih)
+                        'NOT CONTACTED' => 'danger',   // Merah (Teks Putih)
+                        default => 'gray',
+                    })
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('keterangan'),
                 Tables\Columns\TextColumn::make('paket'),
                 Tables\Columns\TextColumn::make('tgl_aktivasi')->date(),
