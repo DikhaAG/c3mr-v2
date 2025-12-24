@@ -16,7 +16,7 @@ use Filament\Tables\Table;
 
 class PelangganResource extends Resource
 {
-    protected static ?string $navigationLabel = 'Pelanggan';
+    protected static ?string $navigationLabel = 'Data Call';
     protected static ?string $model = Pelanggan::class;
     public static function getNavigationBadge(): ?string
     {

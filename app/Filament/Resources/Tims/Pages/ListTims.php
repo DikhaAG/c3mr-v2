@@ -9,6 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListTims extends ListRecords
 {
     protected static string $resource = TimResource::class;
+    protected static ?string $title = 'Tim';
 
     protected function getHeaderActions(): array
     {

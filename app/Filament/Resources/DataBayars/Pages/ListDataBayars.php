@@ -14,6 +14,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListDataBayars extends ListRecords
 {
     protected static string $resource = DataBayarResource::class;
+    protected static ?string $title = 'Data Bayar';
 
     protected function getHeaderActions(): array
     {
