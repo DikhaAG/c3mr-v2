@@ -7,6 +7,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use App\Filament\Pages\Dashboard;
+use Filament\Forms\Components\FileUpload;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -21,6 +22,13 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+    public function boot(): void
+    {
+        // Mengizinkan semua FileUpload di Filament hingga 100MB
+        FileUpload::configureUsing(function (FileUpload $component) {
+            $component->maxSize(102400); // Nilai dalam Kilobytes (100MB)
+        });
+    }
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -69,7 +77,8 @@ class AdminPanelProvider extends PanelProvider
             )
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->sidebarCollapsibleOnDesktop()
-
+->databaseNotifications() // TAMBAHKAN INI
+        ->databaseNotificationsPolling('3s'); // Cek progres setiap 3 detik
         ;
     }
 }
