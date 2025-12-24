@@ -23,6 +23,7 @@ class PaketResource extends Resource
     protected static string|UnitEnum|null $navigationGroup = 'Data';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::ClipboardDocument;
 
+    protected static bool $shouldRegisterNavigation = false;
     public static function form(Schema $schema): Schema
     {
         return PaketForm::configure($schema);
