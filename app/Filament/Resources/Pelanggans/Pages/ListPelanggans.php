@@ -14,7 +14,7 @@ class ListPelanggans extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()->label('New Data Call'),
         ];
     }
 }
