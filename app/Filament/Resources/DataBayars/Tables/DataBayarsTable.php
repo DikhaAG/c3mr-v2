@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\DataBayars\Tables;
 
+use App\Filament\Imports\DataBayarImporter;
+use App\Models\DataBayar;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ImportAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -16,6 +19,26 @@ class DataBayarsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->headerActions([
+                ImportAction::make()
+                    ->importer(DataBayarImporter::class)
+                    ->disabled(
+                        fn()
+                        => DataBayar::query()
+                            ->whereMonth('created_at', now()->month)
+                            ->whereYear('created_at', now()->year)
+                            ->exists()
+                    )
+                    ->tooltip(
+                        fn()
+                        => DataBayar::query()
+                            ->whereMonth('created_at', now()->month)
+                            ->whereYear('created_at', now()->year)
+                            ->exists()
+                        ? 'Import dikunci karena data bayar untuk bulan ini sudah ada'
+                        : null
+                    ),
+            ])
             ->columns([
                 TextColumn::make('bb_id')
                     ->searchable(),
