@@ -23,13 +23,16 @@ class StatsOverview extends StatsOverviewWidget
     protected function getStats(): array
     {
         // Mengambil filter dari Page (Filament 4 menggunakan struktur array yang sama)
-        $startDate = $this->filters['startDate'] ?? null;
-        $endDate = $this->filters['endDate'] ?? null;
+        $startDate = $this->filters['from'] ?? null;
+        $endDate = $this->filters['until'] ?? null;
+        $los = $this->filters['los_bucket'] ?? null;
 
         // Base query dengan filter tanggal
         $query = Pelanggan::query()
             ->when($startDate, fn($q) => $q->whereDate('tanggal', '>=', $startDate))
-            ->when($endDate, fn($q) => $q->whereDate('tanggal', '<=', $endDate));
+            ->when($endDate, fn($q) => $q->whereDate('tanggal', '<=', $endDate))
+            ->when($los, fn($q) => $this->applyLosFilter($q, $los));
+        ;
 
         return [
             Stat::make('Total Pelanggan', $query->count())
@@ -70,5 +73,15 @@ class StatsOverview extends StatsOverviewWidget
             /* )->icon('heroicon-m-shield-check'), */
         ];
     }
-
+    protected function applyLosFilter($query, string $bucket)
+    {
+        return match ($bucket) {
+            '0-3'   => $query->whereBetween('los', [0, 3]),
+            '4-6'   => $query->whereBetween('los', [4, 6]),
+            '7-12'  => $query->whereBetween('los', [7, 12]),
+            '12-24' => $query->whereBetween('los', [12, 24]),
+            '24+'   => $query->where('los', '>', 24),
+            default => $query,
+        };
+    }
 }

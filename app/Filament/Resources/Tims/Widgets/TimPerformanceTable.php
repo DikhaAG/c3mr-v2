@@ -19,29 +19,33 @@ class TimPerformanceTable extends TableWidget
     public function table(Table $table): Table
     {
         // Mengambil filter tanggal dari Dashboard
-        $startDate = $this->filters['startDate'] ?? null;
-        $endDate = $this->filters['endDate'] ?? null;
+        $startDate = $this->filters['from'] ?? null;
+        $endDate = $this->filters['until'] ?? null;
+        $los = $this->filters['los_bucket'] ?? null;
 
         return $table
             ->query(
                 Tim::query()
                     ->withCount([
                         // Total pelanggan dimana pelanggan.admin == tim.nama_lengkap
-                        'pelanggans as total_pelanggan' => function (Builder $query) use ($startDate, $endDate) {
+                        'pelanggans as total_pelanggan' => function (Builder $query) use ($startDate, $endDate, $los) {
                             $query->when($startDate, fn($q) => $q->whereDate('tanggal', '>=', $startDate))
-                                  ->when($endDate, fn($q) => $q->whereDate('tanggal', '<=', $endDate));
+                                ->when($endDate, fn($q) => $q->whereDate('tanggal', '<=', $endDate))
+                                ->when($los, fn($q) => $this->applyLosFilter($q, $los));
                         },
                         // Hitung status CONTACTED
-                        'pelanggans as count_contacted' => function (Builder $query) use ($startDate, $endDate) {
+                        'pelanggans as count_contacted' => function (Builder $query) use ($startDate, $endDate, $los) {
                             $query->where('r_caring_status', 'CONTACTED')
-                                  ->when($startDate, fn($q) => $q->whereDate('tanggal', '>=', $startDate))
-                                  ->when($endDate, fn($q) => $q->whereDate('tanggal', '<=', $endDate));
+                                ->when($startDate, fn($q) => $q->whereDate('tanggal', '>=', $startDate))
+                                ->when($endDate, fn($q) => $q->whereDate('tanggal', '<=', $endDate))
+                                ->when($los, fn($q) => $this->applyLosFilter($q, $los));
                         },
                         // Hitung status NOT CONTACTED
-                        'pelanggans as count_not_contacted' => function (Builder $query) use ($startDate, $endDate) {
+                        'pelanggans as count_not_contacted' => function (Builder $query) use ($startDate, $endDate, $los) {
                             $query->where('r_caring_status', 'NOT CONTACTED')
-                                  ->when($startDate, fn($q) => $q->whereDate('tanggal', '>=', $startDate))
-                                  ->when($endDate, fn($q) => $q->whereDate('tanggal', '<=', $endDate));
+                                ->when($startDate, fn($q) => $q->whereDate('tanggal', '>=', $startDate))
+                                ->when($endDate, fn($q) => $q->whereDate('tanggal', '<=', $endDate))
+                                ->when($los, fn($q) => $this->applyLosFilter($q, $los));
                         },
                     ])
             )
@@ -83,5 +87,16 @@ class TimPerformanceTable extends TableWidget
             ])
             // Default sorting berdasarkan total pelanggan terbanyak
             ->defaultSort('total_pelanggan', 'desc');
+    }
+    protected function applyLosFilter($query, string $bucket)
+    {
+        return match ($bucket) {
+            '0-3'   => $query->whereBetween('los', [0, 3]),
+            '4-6'   => $query->whereBetween('los', [4, 6]),
+            '7-12'  => $query->whereBetween('los', [7, 12]),
+            '12-24' => $query->whereBetween('los', [12, 24]),
+            '24+'   => $query->where('los', '>', 24),
+            default => $query,
+        };
     }
 }
