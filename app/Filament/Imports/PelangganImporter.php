@@ -116,13 +116,13 @@ class PelangganImporter extends Importer
 
     public function resolveRecord(): Pelanggan
     {
-        /**
-         * Di Filament 4, Anda bisa melakukan logic "Upsert" di sini.
-         * Contoh: mencari pelanggan berdasarkan id_pelanggan agar tidak duplikat.
-         */
-        return Pelanggan::firstOrNew([
-            'id_pelanggan' => $this->data['id_pelanggan'],
-        ]);
+        /* /** */
+        /*  * Di Filament 4, Anda bisa melakukan logic "Upsert" di sini. */
+        /*  * Contoh: mencari pelanggan berdasarkan id_pelanggan agar tidak duplikat. */
+        /*  */
+        /* return Pelanggan::firstOrNew([ */
+        /*     'id_pelanggan' => $this->data['id_pelanggan'], */
+        /* ]); */
     }
 
     public static function getCompletedNotificationBody(Import $import): string
