@@ -131,7 +131,24 @@ class PelangganImporter extends Importer
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error("Gagal buat Tim: " . $e->getMessage());
             }
-        }        return new Pelanggan();
+        }
+
+        $keteranganName = $this->data['keterangan'] ?? null;
+
+        if (!empty($keteranganName)) {
+            try {
+                \App\Models\Keterangan::updateOrCreate(
+                    ['nama' => $keteranganName], // Cari berdasarkan nama
+                    [
+                        'nama' => $keteranganName,
+                    ]
+                );
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Gagal buat Keterangan: " . $e->getMessage());
+            }
+        }
+
+        return new Pelanggan();
     }
 
     public static function getCompletedNotificationBody(Import $import): string
