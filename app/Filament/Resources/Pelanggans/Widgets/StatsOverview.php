@@ -29,8 +29,8 @@ class StatsOverview extends StatsOverviewWidget
 
         // Base query dengan filter tanggal
         $query = Pelanggan::query()
-            ->when($startDate, fn($q) => $q->whereDate('tanggal', '>=', $startDate))
-            ->when($endDate, fn($q) => $q->whereDate('tanggal', '<=', $endDate))
+            ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
+            ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate))
             ->when($los, fn($q) => $this->applyLosFilter($q, $los));
         ;
 

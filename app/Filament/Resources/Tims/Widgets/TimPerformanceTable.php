@@ -29,22 +29,22 @@ class TimPerformanceTable extends TableWidget
                     ->withCount([
                         // Total pelanggan dimana pelanggan.admin == tim.nama_lengkap
                         'pelanggans as total_pelanggan' => function (Builder $query) use ($startDate, $endDate, $los) {
-                            $query->when($startDate, fn($q) => $q->whereDate('tanggal', '>=', $startDate))
-                                ->when($endDate, fn($q) => $q->whereDate('tanggal', '<=', $endDate))
+                            $query->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
+                                ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate))
                                 ->when($los, fn($q) => $this->applyLosFilter($q, $los));
                         },
                         // Hitung status CONTACTED
                         'pelanggans as count_contacted' => function (Builder $query) use ($startDate, $endDate, $los) {
                             $query->where('r_caring_status', 'CONTACTED')
-                                ->when($startDate, fn($q) => $q->whereDate('tanggal', '>=', $startDate))
-                                ->when($endDate, fn($q) => $q->whereDate('tanggal', '<=', $endDate))
+                                ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
+                                ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate))
                                 ->when($los, fn($q) => $this->applyLosFilter($q, $los));
                         },
                         // Hitung status NOT CONTACTED
                         'pelanggans as count_not_contacted' => function (Builder $query) use ($startDate, $endDate, $los) {
                             $query->where('r_caring_status', 'NOT CONTACTED')
-                                ->when($startDate, fn($q) => $q->whereDate('tanggal', '>=', $startDate))
-                                ->when($endDate, fn($q) => $q->whereDate('tanggal', '<=', $endDate))
+                                ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
+                                ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate))
                                 ->when($los, fn($q) => $this->applyLosFilter($q, $los));
                         },
                     ])
