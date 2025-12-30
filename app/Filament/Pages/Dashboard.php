@@ -24,18 +24,6 @@ class Dashboard extends BaseDashboard
     public function filtersForm(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make()
-                ->schema([
-                    DatePicker::make('startDate')
-                        ->label('Dari Tanggal')
-                        ->native(false) // Opsional: agar UI lebih konsisten di v4
-                        ->displayFormat('d/m/Y'),
-                    DatePicker::make('endDate')
-                        ->label('Sampai Tanggal')
-                        ->native(false)
-                        ->displayFormat('d/m/Y'),
-                ])
-                ->columns(2),
             Section::make('Filter Pivot')
                 ->schema([
                     DatePicker::make('from')
