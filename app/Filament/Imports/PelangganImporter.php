@@ -114,16 +114,25 @@ class PelangganImporter extends Importer
         ];
     }
 
-    /* public function resolveRecord(): Pelanggan */
-    /* { */
-    /*     /** */
-    /*      * Di Filament 4, Anda bisa melakukan logic "Upsert" di sini. */
-    /*      * Contoh: mencari pelanggan berdasarkan id_pelanggan agar tidak duplikat. */
-    /*      */
-    /*     return Pelanggan::firstOrNew([ */
-    /*         'id_pelanggan' => $this->data['id_pelanggan'], */
-    /*     ]); */
-    /* } */
+    public function resolveRecord(): Pelanggan
+    {
+        $adminName = $this->data['admin'] ?? null;
+
+        if (!empty($adminName)) {
+            try {
+                \App\Models\Tim::updateOrCreate(
+                    ['nama_lengkap' => $adminName], // Cari berdasarkan nama
+                    [
+                        'username' => $adminName,
+                        'regional' => $this->data['regional'] ?? 'SUMBAGSEL',
+                        'branch'   => $this->data['branch'] ?? "PALEMBANG",
+                    ]
+                );
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Gagal buat Tim: " . $e->getMessage());
+            }
+        }        return new Pelanggan();
+    }
 
     public static function getCompletedNotificationBody(Import $import): string
     {
