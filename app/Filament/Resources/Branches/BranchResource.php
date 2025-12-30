@@ -22,7 +22,7 @@ class BranchResource extends Resource
     protected static string|UnitEnum|null $navigationGroup = 'Data';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::BuildingLibrary;
 
-    protected static bool $shouldRegisterNavigation = false;
+    protected static bool $shouldRegisterNavigation = true;
     public static function form(Schema $schema): Schema
     {
         return BranchForm::configure($schema);

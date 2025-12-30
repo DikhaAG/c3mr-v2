@@ -23,7 +23,7 @@ class KeteranganResource extends Resource
     protected static string|UnitEnum|null $navigationGroup = 'Data';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::PencilSquare;
 
-    protected static bool $shouldRegisterNavigation = false;
+    protected static bool $shouldRegisterNavigation = true;
     public static function form(Schema $schema): Schema
     {
         return KeteranganForm::configure($schema);
