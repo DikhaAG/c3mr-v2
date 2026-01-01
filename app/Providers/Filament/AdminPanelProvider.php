@@ -64,7 +64,7 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-             ->darkMode(false)
+            ->darkMode(false)
             ->brandName('C3MR')
             ->colors(
                 [
@@ -78,8 +78,10 @@ class AdminPanelProvider extends PanelProvider
             )
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->sidebarCollapsibleOnDesktop()
-->databaseNotifications() // TAMBAHKAN INI
-        ->databaseNotificationsPolling('3s'); // Cek progres setiap 3 detik
-        ;
+            ->databaseNotifications() // TAMBAHKAN INI
+            ->databaseNotificationsPolling('3s')
+            ->assets([
+                \Filament\Support\Assets\Css::make('pivot-filter-css', asset('css/filament/custom.css')),
+            ]);;
     }
 }

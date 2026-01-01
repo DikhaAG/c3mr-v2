@@ -1,0 +1,10 @@
+/* FORCE pivot filter jadi 3 kolom */
+.pivot-filter .fi-sc.fi-grid {
+    --cols-default: repeat(3, minmax(200px, 1fr)) !important;
+}
+
+/* Pastikan tiap kolom tidak aneh-aneh */
+.pivot-filter .fi-grid-col {
+    width: auto !important;
+    min-width: 0 !important;
+}

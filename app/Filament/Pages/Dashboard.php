@@ -16,6 +16,7 @@ use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use App\Exports\CaringExport;
 use App\Models\Pelanggan;
 use Filament\Actions\Action;
+use Filament\Schemas\Components\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -61,7 +62,7 @@ class Dashboard extends BaseDashboard
     public function filtersForm(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('Filter Pivot')
+            View::make('filament.schemas.components.filter-pivot')
                 ->schema([
                     DatePicker::make('from')
                         ->label('Dari Tanggal')
@@ -82,7 +83,9 @@ class Dashboard extends BaseDashboard
                         ])
                         ->placeholder('Semua LOS'),
                 ])
-                ->columns(3),
+                ->viewData([
+                    'title' => 'Filter Pivot',
+                ]),
         ]);
     }
     public function getWidgets(): array
