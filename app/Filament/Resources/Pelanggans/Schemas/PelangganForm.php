@@ -42,9 +42,7 @@ class PelangganForm
                         Select::make('keterangan')
                             ->options(fn() => Keterangan::pluck('nama', 'nama'))
                             ->searchable(),
-                        Select::make('paket')
-                            ->options(fn() => Paket::pluck('nama', 'nama'))
-                            ->searchable(),
+                        TextInput::make('keterangan2')->label('Keterangan Tambahan'),
                         Select::make('status_bayar')
                             ->options(fn() => StatusBayar::pluck('nama', 'nama'))
                             ->searchable(),
