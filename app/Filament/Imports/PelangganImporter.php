@@ -3,10 +3,20 @@
 namespace App\Filament\Imports;
 
 use App\Models\Pelanggan;
+use App\Models\Tim;
+use App\Models\Branch;
+use App\Models\Fungsi;
+use App\Models\Keterangan;
+use App\Models\Keterangan2;
+use App\Models\Paket;
+use App\Models\Regional;
+use App\Models\RCaringStatus;
+use App\Models\StatusBayar;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Number;
+use Illuminate\Support\Facades\Log;
 
 class PelangganImporter extends Importer
 {
@@ -15,148 +25,232 @@ class PelangganImporter extends Importer
     public static function getColumns(): array
     {
         return [
+            // TIDAK DIUBAH
             ImportColumn::make('tanggal')
                 ->label('TANGGAL')
-                ->rules(['required', 'date']),
+                ->guess(['TANGGAL'])
+                ->rules(['nullable', 'date']),
 
             ImportColumn::make('id_pelanggan')
                 ->label('SND')
+                ->guess(['SND'])
                 ->requiredMapping()
-                ->rules(['required', 'max:255']),
+                ->rules(['nullable', 'max:255']),
 
             ImportColumn::make('domisili')
                 ->label('WOK')
-                ->rules(['max:255']),
+                ->guess(['WOK'])
+                ->rules(['nullable', 'max:255']),
 
             ImportColumn::make('category_billing')
                 ->label('CATEGORY BILLING')
-                ->rules(['max:255']),
+                ->guess(['CATEGORY BILLING'])
+                ->rules(['nullable', 'max:255']),
 
             ImportColumn::make('nama_pelanggan')
                 ->label('NAMA PELANGGAN')
-                ->rules(['max:255']),
+                ->guess(['NAMA PELANGGAN'])
+                ->rules(['max:255', 'nullable']),
 
             ImportColumn::make('cp')
                 ->label('CP')
-                ->rules(['max:255']),
+                ->guess(['CP'])
+                ->rules(['max:255', 'nullable']),
 
             ImportColumn::make('branch')
                 ->label('BRANCH')
-                ->rules(['max:255']),
+                ->guess(['BRANCH'])
+                ->rules(['max:255', 'nullable']),
 
             ImportColumn::make('sto')
                 ->label('STO')
-                ->rules(['max:255']),
+                ->guess(['STO'])
+                ->rules(['max:255', 'nullable']),
 
             ImportColumn::make('los')
                 ->label('LOS')
-                ->rules(['max:255']),
+                ->guess(['LOS'])
+                ->rules(['max:255', 'nullable']),
 
             ImportColumn::make('status')
                 ->label('STATUS')
-                ->rules(['max:255']),
+                ->guess(['STATUS'])
+                ->rules(['max:255', 'nullable']),
 
             ImportColumn::make('habit_category')
                 ->label('HABIT CATEGORY')
-                ->rules(['max:255']),
+                ->guess(['HABIT CATEGORY', 'habit_category'])
+                ->rules(['max:255', 'nullable']),
 
             ImportColumn::make('total_tagihan')
                 ->label('TOTAL TAGIHAN')
+                ->guess(['TOTAL TAGIHAN'])
                 ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'numeric']),
+                ->rules(['nullable', 'numeric']),
 
             ImportColumn::make('fungsi')
                 ->label('FUNGSI')
-                ->rules(['max:255']),
+                ->guess(['FUNGSI'])
+                ->rules(['max:255', 'nullable']),
 
             ImportColumn::make('admin')
                 ->label('ADMIN')
-                ->rules(['max:255']),
+                ->guess(['ADMIN', 'Admin'])
+                ->rules(['max:255', 'nullable']),
 
             ImportColumn::make('r_caring_status')
                 ->label('R_CARING_STATUS')
-                ->rules(['max:255']),
+                ->rules(['max:255', 'nullable']),
 
             ImportColumn::make('keterangan')
-                ->label('KETERANGAN')
-                ->rules(['max:255']),
+                ->label('Keterangan')
+                ->rules(['max:255', 'nullable']),
 
-            ImportColumn::make('paket')
-                ->label('PAKET')
-                ->rules(['max:255']),
+            ImportColumn::make('keterangan2')
+                ->label('KETERANGAN2')
+                ->rules(['max:255', 'nullable']),
 
             ImportColumn::make('tgl_aktivasi')
-                ->label('TGL_AKTIVASI')
+                ->label('TGL AKTIVASI')
+                ->guess(['TGL AKTIVASI', 'TGL_AKTIVASI'])
                 ->rules(['nullable', 'date']),
 
             ImportColumn::make('status_bayar')
                 ->label('STATUS BAYAR')
-                ->rules(['max:255']),
+                ->guess(['STATUS  BAYAR ', 'STATUS BAYAR'])
+                ->rules(['max:255', 'nullable']),
 
             ImportColumn::make('payment_date')
                 ->label('PAYMENT_DATE 1')
+                ->guess(['PAYMENT_DATE 1'])
                 ->rules(['nullable', 'date']),
 
             ImportColumn::make('payment_amount')
                 ->label('PAYMENT_AMOUNT 1')
+                ->guess(['PAYMENT_AMOUNT 1'])
                 ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'numeric']),
+                ->rules(['numeric', 'nullable']),
 
             ImportColumn::make('channel_bayar')
                 ->label('CHANEL BAYAR 1')
-                ->rules(['max:255']),
+                ->guess(['CHANEL BAYAR 1'])
+                ->rules(['max:255', 'nullable']),
 
             ImportColumn::make('regional')
                 ->label('REGIONAL')
-                ->rules(['max:100']),
+                ->guess(['REGIONAL', 'Regional'])
+                ->rules(['nullable', 'max:100']), // <-- MODIFIKASI: dibuat nullable agar CSV tanpa regional tidak gagal
         ];
     }
 
     public function resolveRecord(): Pelanggan
     {
-        $adminName = $this->data['admin'] ?? null;
+        // ================== MODIFIKASI DIMULAI ==================
 
-        if (!empty($adminName)) {
-            try {
-                \App\Models\Tim::updateOrCreate(
-                    ['nama_lengkap' => $adminName], // Cari berdasarkan nama
-                    [
-                        'username' => $adminName,
-                        'regional' => $this->data['regional'] ?? 'SUMBAGSEL',
-                        'branch'   => $this->data['branch'] ?? "PALEMBANG",
-                    ]
-                );
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error("Gagal buat Tim: " . $e->getMessage());
-            }
+        if (
+            ! array_key_exists('regional', $this->data) // <-- MODIFIKASI: jika kolom regional tidak ada di CSV
+            || $this->clean($this->data['regional'] ?? null) === null // <-- MODIFIKASI: atau ada tapi kosong
+        ) {
+            $this->data['regional'] = 'SUMBAGSEL'; // <-- MODIFIKASI: set default regional
         }
 
-        $keteranganName = $this->data['keterangan'] ?? null;
+        // ================== MODIFIKASI SELESAI ==================
 
-        if (!empty($keteranganName)) {
-            try {
-                \App\Models\Keterangan::updateOrCreate(
-                    ['nama' => $keteranganName], // Cari berdasarkan nama
-                    [
-                        'nama' => $keteranganName,
-                    ]
-                );
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error("Gagal buat Keterangan: " . $e->getMessage());
-            }
-        }
+        $this->syncMasterDataForRow();
 
         return new Pelanggan();
     }
 
+    protected function syncMasterDataForRow(): void
+    {
+        $branch   = $this->clean($this->data['branch'] ?? null);
+        $fungsi   = $this->clean($this->data['fungsi'] ?? null);
+        $ket      = $this->clean($this->data['keterangan'] ?? null);
+        $ket2     = $this->clean($this->data['keterangan2'] ?? null);
+        $paket    = $this->clean($this->data['paket'] ?? null);
+
+        // ================== MODIFIKASI DIMULAI ==================
+
+        $regional = $this->clean($this->data['regional'] ?? null) ?? 'SUMBAGSEL';
+        // <-- MODIFIKASI: memastikan regional TIDAK PERNAH null saat dipakai di master data
+
+        // ================== MODIFIKASI SELESAI ==================
+
+        $rcs      = $this->clean($this->data['r_caring_status'] ?? null);
+        $sb       = $this->clean($this->data['status_bayar'] ?? null);
+        $admin    = $this->clean($this->data['admin'] ?? null);
+
+        try {
+            if ($branch) {
+                Branch::firstOrCreate(['nama' => $branch]);
+            }
+
+            if ($fungsi) {
+                Fungsi::firstOrCreate(['nama' => $fungsi]);
+            }
+
+            if ($ket) {
+                Keterangan::firstOrCreate(['nama' => $ket]);
+            }
+
+            if ($ket2) {
+                Keterangan2::firstOrCreate(['nama' => $ket2]);
+            }
+
+            if ($paket) {
+                Paket::firstOrCreate(['nama' => $paket]);
+            }
+
+            Regional::firstOrCreate(['nama' => $regional]);
+            // <-- MODIFIKASI: master regional SELALU ada, minimal SUMBAGSEL
+
+            if ($rcs) {
+                RCaringStatus::firstOrCreate(['nama' => $rcs]);
+            }
+
+            if ($sb) {
+                StatusBayar::firstOrCreate(['nama' => $sb]);
+            }
+
+            if ($admin) {
+                Tim::updateOrCreate(
+                    ['nama_lengkap' => $admin],
+                    [
+                        'username' => $admin,
+                        'regional' => $regional, // <-- MODIFIKASI: sekarang dijamin terisi
+                        'branch'   => $branch ?? 'PALEMBANG',
+                    ]
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::error('Import master data gagal: ' . $e->getMessage(), [
+                'row' => $this->data,
+            ]);
+        }
+    }
+
+    protected function clean(?string $value): ?string
+    {
+        $value = is_string($value) ? trim($value) : $value;
+        return ($value === '' || $value === null) ? null : $value;
+    }
+
     public static function getCompletedNotificationBody(Import $import): string
     {
-        $body = 'Impor pelanggan telah selesai dan ' . Number::format($import->successful_rows) . ' ' . str('baris')->plural($import->successful_rows) . ' berhasil diimpor.';
+        $body = 'Impor pelanggan telah selesai dan '
+            . Number::format($import->successful_rows)
+            . ' '
+            . str('baris')->plural($import->successful_rows)
+            . ' berhasil diimpor.';
 
         if ($failedRowsCount = $import->getFailedRowsCount()) {
-            $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('baris')->plural($failedRowsCount) . ' gagal diimpor.';
+            $body .= ' '
+                . Number::format($failedRowsCount)
+                . ' '
+                . str('baris')->plural($failedRowsCount)
+                . ' gagal diimpor.';
         }
 
         return $body;
