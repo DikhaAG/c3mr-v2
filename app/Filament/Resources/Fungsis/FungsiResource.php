@@ -23,7 +23,7 @@ class FungsiResource extends Resource
     protected static string|UnitEnum|null $navigationGroup = 'Data';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::UserCircle;
 
-    protected static bool $shouldRegisterNavigation = true;
+    protected static bool $shouldRegisterNavigation = false;
     public static function form(Schema $schema): Schema
     {
         return FungsiForm::configure($schema);
