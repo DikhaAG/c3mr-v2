@@ -8,4 +8,11 @@ use Filament\Resources\Pages\CreateRecord;
 class CreatePelanggan extends CreateRecord
 {
     protected static string $resource = PelangganResource::class;
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getCreateFormAction(),   // tombol Create
+            $this->getCancelFormAction(),   // tombol Cancel
+        ];
+    }
 }
