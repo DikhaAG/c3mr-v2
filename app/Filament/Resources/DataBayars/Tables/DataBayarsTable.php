@@ -21,23 +21,23 @@ class DataBayarsTable
         return $table
             ->headerActions([
                 ImportAction::make()
-                    ->importer(DataBayarImporter::class)
-                    ->disabled(
-                        fn()
-                        => DataBayar::query()
-                            ->whereMonth('created_at', now()->month)
-                            ->whereYear('created_at', now()->year)
-                            ->exists()
-                    )
-                    ->tooltip(
-                        fn()
-                        => DataBayar::query()
-                            ->whereMonth('created_at', now()->month)
-                            ->whereYear('created_at', now()->year)
-                            ->exists()
-                        ? 'Import dikunci karena data bayar untuk bulan ini sudah ada'
-                        : null
-                    ),
+                    ->importer(DataBayarImporter::class),
+                /* ->disabled( */
+                /*     fn() */
+                /*     => DataBayar::query() */
+                /*         ->whereMonth('created_at', now()->month) */
+                /*         ->whereYear('created_at', now()->year) */
+                /*         ->exists() */
+                /* ) */
+                /* ->tooltip( */
+                /*     fn() */
+                /*     => DataBayar::query() */
+                /*         ->whereMonth('created_at', now()->month) */
+                /*         ->whereYear('created_at', now()->year) */
+                /*         ->exists() */
+                /*     ? 'Import dikunci karena data bayar untuk bulan ini sudah ada' */
+                /*     : null */
+                /* ), */
             ])
             ->columns([
                 TextColumn::make('bb_id')

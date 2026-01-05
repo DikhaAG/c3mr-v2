@@ -27,15 +27,16 @@ class PelanggansTable
             ->headerActions([
                 /* Actions\ImportAction::make()->importer(PelangganImporter::class), */
                 Actions\ImportAction::make()->label('Import Data Call')
-                    ->importer(PelangganImporter::class)
-                    ->disabled(function () {
-                        return Pelanggan::whereDate('created_at', today())->exists();
-                    })
-                    ->tooltip(function () {
-                        return Pelanggan::whereDate('created_at', today())->exists()
-                            ? 'Import dikunci karena data call hari ini sudah ada'
-                            : null;
-                    }),            ])
+                    ->importer(PelangganImporter::class),
+                /* ->disabled(function () { */
+                /*     return Pelanggan::whereDate('created_at', today())->exists(); */
+                /* }) */
+                /* ->tooltip(function () { */
+                /*     return Pelanggan::whereDate('created_at', today())->exists() */
+                /*         ? 'Import dikunci karena data call hari ini sudah ada' */
+                /*         : null; */
+                /* }),        */
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make('tanggal')->date()->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('id_pelanggan')->sortable()->searchable(),
