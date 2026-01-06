@@ -4,75 +4,112 @@ namespace App\Filament\Resources\Pelanggans\Widgets;
 
 use App\Models\Pelanggan;
 use App\Models\Tim;
-/* use App\Models\RCaringStatus; */
+use App\Models\DataBayar; // <-- TAMBAH: untuk ambil paid/unpaid dari tabel data_bayars
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
-use Illuminate\Support\Number; // Standar baru Laravel untuk format angka
+use Illuminate\Support\Number;
 
 class StatsOverview extends StatsOverviewWidget
 {
     use InteractsWithPageFilters;
 
     protected int|string|array $columnSpan = 'full';
-    // Atau atur grid-nya
+
     protected function getColumns(): int
     {
-        return 3; // Menampilkan 3 card per baris (akan jadi 2 baris)
+        return 3;
     }
+
     protected function getStats(): array
     {
-        // Mengambil filter dari Page (Filament 4 menggunakan struktur array yang sama)
         $startDate = $this->filters['from'] ?? null;
-        $endDate = $this->filters['until'] ?? null;
-        $los = $this->filters['los_bucket'] ?? null;
+        $endDate   = $this->filters['until'] ?? null;
+        $los       = $this->filters['los_bucket'] ?? null;
 
-        // Base query dengan filter tanggal
-        $query = Pelanggan::query()
+        // Base query pelanggan (ini jadi "sumber kebenaran" filter dashboard)
+        $pelangganQuery = Pelanggan::query()
             ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
             ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate))
             ->when($los, fn($q) => $this->applyLosFilter($q, $los));
-        ;
+
+        /**
+         * Query DataBayar yang "mengikuti" filter pelanggan.
+         * Kita pakai subquery biar tetap efisien (tidak pluck ribuan baris ke PHP).
+         *
+         * Asumsi mapping:
+         *  - data_bayars.account_number == pelanggans.id_pelanggan
+         * Kalau ternyata beda, ganti kolom account_number di bawah ini.
+         */
+        $dataBayarQuery = DataBayar::query()
+            ->whereIn('account_number', (clone $pelangganQuery)->select('id_pelanggan'));
+
+        // === STAT BARU ===
+        $totalJanjiBayar = (clone $pelangganQuery)
+            ->where('keterangan', 'JANJI BAYAR')
+            ->count();
+
+        // Total tagihan paid/unpaid (pakai bill_amount_1 sebagai "nilai tagihan")
+        // Kalau kamu maunya pakai jumlah_bayar untuk PAID, tinggal ganti sum()-nya.
+        $totalPaid   = (clone $dataBayarQuery)->where('status_tagihan', 'PAID')->sum('bill_amount_1');
+        $totalUnpaid = (clone $dataBayarQuery)->where('status_tagihan', 'UNPAID')->sum('bill_amount_1');
+
+        // Optional: jumlah baris paid/unpaid (biar ada konteks)
+        $countPaid   = (clone $dataBayarQuery)->where('status_tagihan', 'PAID')->count();
+        $countUnpaid = (clone $dataBayarQuery)->where('status_tagihan', 'UNPAID')->count();
 
         return [
-            Stat::make('Total Pelanggan', $query->count())
+            Stat::make('Total Pelanggan', (clone $pelangganQuery)->count())
                 ->icon('heroicon-m-users'),
 
-            Stat::make('Total Tagihan', Number::currency($query->sum('total_tagihan'), 'IDR', 'id'))
+            Stat::make('Total Tagihan', Number::currency((clone $pelangganQuery)->sum('total_tagihan'), 'IDR', 'id'))
                 ->icon('heroicon-m-banknotes'),
 
             Stat::make(
                 'Total Call Tim',
-                // Clone query agar filter tanggal tetap terbawa namun tidak merusak query utama
-                (clone $query)->whereIn('admin', Tim::pluck('nama_lengkap'))->count()
+                (clone $pelangganQuery)->whereIn('admin', Tim::pluck('nama_lengkap'))->count()
             )->icon('heroicon-m-phone-arrow-up-right'),
-            // Card Baru: Contacted
-            Stat::make('Contacted', (clone $query)->where('r_caring_status', 'CONTACTED')->count())
+
+            Stat::make('Contacted', (clone $pelangganQuery)->where('r_caring_status', 'CONTACTED')->count())
                 ->description('Pelanggan berhasil dihubungi')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success')
                 ->icon('heroicon-m-phone'),
 
-            // Card Baru: Not Contacted
-            Stat::make('Not Contacted', (clone $query)->where('r_caring_status', 'NOT CONTACTED')->count())
+            Stat::make('Not Contacted', (clone $pelangganQuery)->where('r_caring_status', 'NOT CONTACTED')->count())
                 ->description('Pelanggan gagal dihubungi')
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger')
                 ->icon('heroicon-m-phone-x-mark'),
 
-            // Card Baru: Belum di-Call (NULL)
-            Stat::make('Belum di-Call', (clone $query)->whereNull('r_caring_status')->count())
+            Stat::make('Belum di-Call', (clone $pelangganQuery)->whereNull('r_caring_status')->count())
                 ->description('Menunggu tindakan')
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('gray')
                 ->icon('heroicon-m-minus-circle'),
-            /**/
-            /* Stat::make( */
-            /*     'Match Caring Status', */
-            /*     (clone $query)->whereIn('r_caring_status', RCaringStatus::pluck('nama'))->count() */
-            /* )->icon('heroicon-m-shield-check'), */
+
+            // === TAMBAHAN: JANJI BAYAR ===
+            Stat::make('Janji Bayar', $totalJanjiBayar)
+                ->description('keterangan = JANJI BAYAR')
+                ->descriptionIcon('heroicon-m-hand-raised')
+                ->color('warning')
+                ->icon('heroicon-m-document-check'),
+
+            // === TAMBAHAN: TAGIHAN PAID/UNPAID dari data_bayars ===
+            Stat::make('Tagihan PAID', Number::currency($totalPaid, 'IDR', 'id'))
+                ->description($countPaid . ' baris (status_tagihan=PAID)')
+                ->descriptionIcon('heroicon-m-check-badge')
+                ->color('success')
+                ->icon('heroicon-m-credit-card'),
+
+            Stat::make('Tagihan UNPAID', Number::currency($totalUnpaid, 'IDR', 'id'))
+                ->description($countUnpaid . ' baris (status_tagihan=UNPAID)')
+                ->descriptionIcon('heroicon-m-exclamation-triangle')
+                ->color('danger')
+                ->icon('heroicon-m-credit-card'),
         ];
     }
+
     protected function applyLosFilter($query, string $bucket)
     {
         return match ($bucket) {
