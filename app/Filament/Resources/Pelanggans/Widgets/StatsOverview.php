@@ -42,9 +42,10 @@ class StatsOverview extends StatsOverviewWidget
          * Kalau ternyata beda, ganti kolom account_number di bawah ini.
          */
         $dataBayarQuery = DataBayar::query()
-            ->whereIn('account_number', (clone $pelangganQuery)->select('id_pelanggan'));
+            ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
+            ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate))
+            ->when($los, fn($q) => $this->applyLosFilter($q, $los));
 
-        // === STAT BARU ===
         $totalJanjiBayar = (clone $pelangganQuery)
             ->where('keterangan', 'JANJI BAYAR')
             ->count();
