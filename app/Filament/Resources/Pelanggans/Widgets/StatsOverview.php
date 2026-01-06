@@ -96,14 +96,14 @@ class StatsOverview extends StatsOverviewWidget
                 ->icon('heroicon-m-document-check'),
 
             // === TAMBAHAN: TAGIHAN PAID/UNPAID dari data_bayars ===
-            Stat::make('Tagihan PAID', Number::currency($totalPaid, 'IDR', 'id'))
-                ->description($countPaid . ' baris (status_tagihan=PAID)')
+            Stat::make('Total Status PAID', $countPaid)
+                ->description('(status_tagihan=PAID)')
                 ->descriptionIcon('heroicon-m-check-badge')
                 ->color('success')
                 ->icon('heroicon-m-credit-card'),
 
-            Stat::make('Tagihan UNPAID', Number::currency($totalUnpaid, 'IDR', 'id'))
-                ->description($countUnpaid . ' baris (status_tagihan=UNPAID)')
+            Stat::make('Total Status UNPAID', $countUnpaid)
+                ->description('(status_tagihan=UNPAID)')
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color('danger')
                 ->icon('heroicon-m-credit-card'),
