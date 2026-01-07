@@ -41,7 +41,20 @@ class PelangganForm
                     TextInput::make('regional'),
                     TextInput::make('branch'),
                     TextInput::make('sto'),
-                    TextInput::make('los')->numeric(),
+
+                    // ⬇️ DIUBAH: dari TextInput → Select dengan bucket LOS
+                    Select::make('los')
+                        ->label('LOS')
+                        ->options([
+                            '0-3'   => '0–3 Bulan',
+                            '4-6'   => '4–6 Bulan',
+                            '7-12'  => '7–12 Bulan',
+                            '12-24' => '12–24 Bulan',
+                            '24+'   => '>24 Bulan',
+                        ])
+                        ->native(false) // ⬅️ dropdown modern (bukan <select> HTML biasa)
+                        ->searchable(), // ⬅️ UX lebih enak kalau opsi makin banyak
+
                     TextInput::make('habit_category'),
                 ])
                 ->columns(3),
