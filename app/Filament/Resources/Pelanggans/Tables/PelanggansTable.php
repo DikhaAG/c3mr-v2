@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\Pelanggans\Tables;
 
-use App\Models\Pelanggan;
 use App\Filament\Imports\PelangganImporter;
+use App\Models\Keterangan; // ✅ tambah ini
 use Filament\Tables\Table;
 use Filament\Tables as Tables;
 use Filament\Forms as Forms;
@@ -25,20 +25,10 @@ class PelanggansTable
                     ->color('danger'),
             )
             ->headerActions([
-                /* Actions\ImportAction::make()->importer(PelangganImporter::class), */
                 Actions\ImportAction::make()->label('Import Data Call')
                     ->importer(PelangganImporter::class),
-                /* ->disabled(function () { */
-                /*     return Pelanggan::whereDate('created_at', today())->exists(); */
-                /* }) */
-                /* ->tooltip(function () { */
-                /*     return Pelanggan::whereDate('created_at', today())->exists() */
-                /*         ? 'Import dikunci karena data call hari ini sudah ada' */
-                /*         : null; */
-                /* }),        */
             ])
             ->columns([
-                /* Tables\Columns\TextColumn::make('tanggal')->date()->sortable()->searchable(), */
                 Tables\Columns\TextColumn::make('created_at')->label('tanggal')->date()->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('id_pelanggan')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('nama_pelanggan')->sortable()->searchable(),
@@ -55,8 +45,8 @@ class PelanggansTable
                 Tables\Columns\TextColumn::make('r_caring_status')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
-                        'CONTACTED' => 'success',      // Hijau (Teks Putih)
-                        'NOT CONTACTED' => 'danger',   // Merah (Teks Putih)
+                        'CONTACTED' => 'success',
+                        'NOT CONTACTED' => 'danger',
                         default => 'gray',
                     })
                     ->searchable()->sortable(),
@@ -77,33 +67,54 @@ class PelanggansTable
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
-                                $data['dari_tanggal'],
+                                $data['dari_tanggal'] ?? null,
                                 fn(Builder $query, $date): Builder => $query->whereDate('tanggal', '>=', $date),
                             )
                             ->when(
-                                $data['sampai_tanggal'],
+                                $data['sampai_tanggal'] ?? null,
                                 fn(Builder $query, $date): Builder => $query->whereDate('tanggal', '<=', $date),
                             );
                     }),
-                // TAMBAHKAN FILTER RADIO BUTTON DI SINI
+
                 Tables\Filters\SelectFilter::make('r_caring_status')
                     ->label('Status Caring')
                     ->options([
                         'CONTACTED' => 'Contacted',
                         'NOT CONTACTED' => 'Not Contacted',
-                        'null' => 'Tidak ada', // Kita gunakan string 'null' sebagai kunci sementara
+                        'null' => 'Tidak ada',
                     ])
                     ->native(false)
                     ->query(function (Builder $query, array $data) {
-                        if ($data['value'] === 'null') {
+                        if (($data['value'] ?? null) === 'null') {
                             return $query->whereNull('r_caring_status');
                         }
 
                         return $query->when(
-                            $data['value'],
+                            $data['value'] ?? null,
                             fn(Builder $query, $value) => $query->where('r_caring_status', $value)
                         );
                     }),
+
+                // ✅ FILTER KETERANGAN (opsi dari tabel keterangans.nama, filter ke pelanggans.keterangan)
+                Tables\Filters\SelectFilter::make('keterangan')
+                    ->label('Keterangan')
+                    ->options(
+                        fn() => Keterangan::query()
+                        ->whereNotNull('nama')
+                        ->where('nama', '!=', '')
+                        ->orderBy('nama')
+                        ->pluck('nama', 'nama')
+                        ->toArray()
+                    )
+                    ->searchable()
+                    ->native(false)
+                    ->query(
+                        fn(Builder $query, array $data)
+                        => $query->when(
+                            $data['value'] ?? null,
+                            fn(Builder $query, $value) => $query->where('keterangan', $value)
+                        )
+                    ),
             ])
             ->recordActions([
                 Actions\EditAction::make(),
@@ -114,6 +125,5 @@ class PelanggansTable
                     DeleteBulkAction::make(),
                 ]),
             ]);
-
     }
 }
