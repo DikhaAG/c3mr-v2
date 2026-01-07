@@ -4,6 +4,7 @@ namespace App\Filament\Resources\DataBayars\Tables;
 
 use App\Filament\Imports\DataBayarImporter;
 use App\Models\DataBayar;
+use App\Models\StatusBayar; // ✅ DITAMBAHKAN: ambil master status dari tabel status_bayars
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -11,6 +12,7 @@ use Filament\Actions\ImportAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter; // ✅ DITAMBAHKAN: filter dropdown
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -188,6 +190,23 @@ class DataBayarsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                // ✅ DITAMBAHKAN: Filter status_tagihan berdasarkan master status_bayars.nama
+                SelectFilter::make('status_tagihan')
+                    ->label('Status Tagihan')
+                    ->options(
+                        StatusBayar::query()
+                            ->orderBy('nama')
+                            ->pluck('nama', 'nama')
+                            ->toArray()
+                    )
+                    ->searchable()
+                    ->native(false)
+                    ->query(function (Builder $query, array $data) {
+                        return $query->when(
+                            $data['value'] ?? null,
+                            fn(Builder $q, string $value) => $q->where('status_tagihan', $value)
+                        );
+                    }),
 
                 Filter::make('created_at')
                     ->schema([
@@ -196,8 +215,8 @@ class DataBayarsTable
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
-                            ->when($data['created_from'], fn($q, $date) => $q->whereDate('created_at', '>=', $date))
-                            ->when($data['created_until'], fn($q, $date) => $q->whereDate('created_at', '<=', $date));
+                            ->when($data['created_from'] ?? null, fn($q, $date) => $q->whereDate('created_at', '>=', $date))
+                            ->when($data['created_until'] ?? null, fn($q, $date) => $q->whereDate('created_at', '<=', $date));
                     }),
             ])
             ->recordActions([
