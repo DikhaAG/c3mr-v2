@@ -38,7 +38,8 @@ class PelanggansTable
                 /* }),        */
             ])
             ->columns([
-                Tables\Columns\TextColumn::make('tanggal')->date()->sortable()->searchable(),
+                /* Tables\Columns\TextColumn::make('tanggal')->date()->sortable()->searchable(), */
+                Tables\Columns\TextColumn::make('created_at')->label('tanggal')->date()->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('id_pelanggan')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('nama_pelanggan')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('cp')->searchable(),
