@@ -39,6 +39,7 @@ class Pelanggan extends Model
         'admin',
         'r_caring_status',
         'keterangan',
+        'keterangan2',
         'paket',
         'tgl_aktivasi',
         'status_bayar',
