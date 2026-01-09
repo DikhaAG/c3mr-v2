@@ -51,11 +51,11 @@ class PelangganForm
                     Select::make('los')
                         ->label('LOS')
                         ->options([
-                            '0-3'   => '0–3 Bulan',
-                            '4-6'   => '4–6 Bulan',
-                            '7-12'  => '7–12 Bulan',
-                            '12-24' => '12–24 Bulan',
-                            '24+'   => '>24 Bulan',
+                            '0-3 Bulan'   => '0–3 Bulan',
+                            '4-6 Bulan'   => '4–6 Bulan',
+                            '7-12 Bulan'  => '7–12 Bulan',
+                            '12-24 Bulan' => '12–24 Bulan',
+                            '24+ Bulan'   => '>24 Bulan',
                         ])
                         ->native(false) // ⬅️ dropdown modern (bukan <select> HTML biasa)
                         ->searchable(), // ⬅️ UX lebih enak kalau opsi makin banyak
