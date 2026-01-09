@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources\Pelanggans\Schemas;
 
+use App\Models\Branch;
 use App\Models\Fungsi;
 use App\Models\Tim;
 use App\Models\RCaringStatus;
 use App\Models\Keterangan;
-use App\Models\Paket;
+use App\Models\Regional;
 use App\Models\StatusBayar;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
@@ -38,8 +39,12 @@ class PelangganForm
             Section::make('Lokasi & Segmentasi')
                 ->schema([
                     TextInput::make('domisili'),
-                    TextInput::make('regional'),
-                    TextInput::make('branch'),
+                    Select::make('regional')
+                        ->options(fn() => Regional::pluck('nama', 'nama'))
+                        ->searchable(),
+                    Select::make('branch')
+                        ->options(fn() => Branch::pluck('nama', 'nama'))
+                        ->searchable(),
                     TextInput::make('sto'),
 
                     // ⬇️ DIUBAH: dari TextInput → Select dengan bucket LOS
@@ -98,9 +103,10 @@ class PelangganForm
                         ->options(fn() => Keterangan::pluck('nama', 'nama'))
                         ->searchable(),
 
-                    Select::make('paket')
-                        ->options(fn() => Paket::pluck('nama', 'nama'))
-                        ->searchable(),
+                    TextInput::make('keterangan2'),
+                    /* Select::make('paket') */
+                    /*     ->options(fn() => Paket::pluck('nama', 'nama')) */
+                    /*     ->searchable(), */
 
                     Select::make('status_bayar')
                         ->options(fn() => StatusBayar::pluck('nama', 'nama'))
