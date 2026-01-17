@@ -19,6 +19,7 @@ use Filament\Actions\Action;
 use Filament\Schemas\Components\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\Los;
 
 class Dashboard extends BaseDashboard
 {
@@ -74,15 +75,12 @@ class Dashboard extends BaseDashboard
 
                     Select::make('los_bucket')
                         ->label('LOS')
-                        ->options([
-                            '0-3'   => '0–3 Bulan',
-                            '4-6'   => '4–6 Bulan',
-                            '7-12'  => '7–12 Bulan',
-                            '12-24' => '12–24 Bulan',
-                            '24+'   => '>24 Bulan',
-                        ])
-                        ->placeholder('Semua LOS'),
+                        ->options(fn() => Los::query()->orderBy('nama')->pluck('nama', 'nama')->toArray())
+                        ->placeholder('Semua LOS')
+                        ->searchable()
+                        ->native(false),
                 ])
+
                 ->viewData([
                     'title' => 'Filter Pivot',
                 ]),
@@ -98,15 +96,10 @@ class Dashboard extends BaseDashboard
             RekapTimCards::class,
         ];
     }
-    protected function applyLosFilter(Builder $query, string $bucket): Builder
+
+    protected function applyLosFilter(Builder $query, string $losNama): Builder
     {
-        return match ($bucket) {
-            '0-3'   => $query->whereBetween('los', [0, 3]),
-            '4-6'   => $query->whereBetween('los', [4, 6]),
-            '7-12'  => $query->whereBetween('los', [7, 12]),
-            '12-24' => $query->whereBetween('los', [12, 24]),
-            '24+'   => $query->where('los', '>', 24),
-            default => $query,
-        };
+        return $query->where('los', $losNama);
     }
+
 }

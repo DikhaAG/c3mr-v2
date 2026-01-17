@@ -88,15 +88,10 @@ class TimPerformanceTable extends TableWidget
             // Default sorting berdasarkan total pelanggan terbanyak
             ->defaultSort('total_pelanggan', 'desc');
     }
-    protected function applyLosFilter($query, string $bucket)
+
+    protected function applyLosFilter($query, string $losNama)
     {
-        return match ($bucket) {
-            '0-3'   => $query->whereBetween('los', [0, 3]),
-            '4-6'   => $query->whereBetween('los', [4, 6]),
-            '7-12'  => $query->whereBetween('los', [7, 12]),
-            '12-24' => $query->whereBetween('los', [12, 24]),
-            '24+'   => $query->where('los', '>', 24),
-            default => $query,
-        };
+        return $query->where('los', $losNama);
     }
+
 }

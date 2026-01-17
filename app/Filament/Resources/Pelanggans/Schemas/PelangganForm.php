@@ -14,6 +14,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
+use App\Models\Los;
 
 class PelangganForm
 {
@@ -47,19 +48,11 @@ class PelangganForm
                         ->searchable(),
                     TextInput::make('sto'),
 
-                    // ⬇️ DIUBAH: dari TextInput → Select dengan bucket LOS
                     Select::make('los')
                         ->label('LOS')
-                        ->options([
-                            '0-3 Bulan'   => '0–3 Bulan',
-                            '4-6 Bulan'   => '4–6 Bulan',
-                            '7-12 Bulan'  => '7–12 Bulan',
-                            '12-24 Bulan' => '12–24 Bulan',
-                            '24+ Bulan'   => '>24 Bulan',
-                        ])
-                        ->native(false) // ⬅️ dropdown modern (bukan <select> HTML biasa)
-                        ->searchable(), // ⬅️ UX lebih enak kalau opsi makin banyak
-
+                        ->options(fn() => Los::query()->orderBy('nama')->pluck('nama', 'nama')->toArray())
+                        ->native(false)
+                        ->searchable(),
                     TextInput::make('habit_category'),
                 ])
                 ->columns(3),

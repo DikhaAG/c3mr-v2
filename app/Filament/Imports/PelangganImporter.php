@@ -17,6 +17,7 @@ use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Number;
 use Illuminate\Support\Facades\Log;
+use App\Models\Los;
 
 class PelangganImporter extends Importer
 {
@@ -170,8 +171,7 @@ class PelangganImporter extends Importer
         $ket      = $this->clean($this->data['keterangan'] ?? null);
         $ket2     = $this->clean($this->data['keterangan2'] ?? null);
         $paket    = $this->clean($this->data['paket'] ?? null);
-
-        // ================== MODIFIKASI DIMULAI ==================
+        $los = $this->normalizeLos($this->data['los'] ?? null);
 
         $regional = $this->clean($this->data['regional'] ?? null) ?? 'SUMBAGSEL';
         // <-- MODIFIKASI: memastikan regional TIDAK PERNAH null saat dipakai di master data
@@ -203,8 +203,11 @@ class PelangganImporter extends Importer
                 Paket::firstOrCreate(['nama' => $paket]);
             }
 
+            if ($los) {
+                Los::firstOrCreate(['nama' => $los]);
+            }
+
             Regional::firstOrCreate(['nama' => $regional]);
-            // <-- MODIFIKASI: master regional SELALU ada, minimal SUMBAGSEL
 
             if ($rcs) {
                 RCaringStatus::firstOrCreate(['nama' => $rcs]);
@@ -254,5 +257,18 @@ class PelangganImporter extends Importer
         }
 
         return $body;
+    }
+
+    protected function normalizeLos(?string $value): ?string
+    {
+        $value = $this->clean($value);
+        if (! $value) {
+            return null;
+        }
+
+        $value = str_replace(["–", "—"], "-", $value);   // samakan dash
+        $value = preg_replace('/\s+/', ' ', $value);     // rapikan spasi
+
+        return trim($value);
     }
 }
